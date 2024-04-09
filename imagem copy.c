@@ -83,7 +83,7 @@ Image toGrayScale(Image img){
 FILE* writeGreyScaleImage(Image img){
     if (img.format == RGB){
         printf("Wrong write function called, switching over...\n");
-        writeColorImage(img);
+        return writeColorImage(img);
     }
     FILE *new_fp;
     new_fp = fopen("new_Bugio8.ppm","w");
@@ -103,7 +103,7 @@ FILE* writeGreyScaleImage(Image img){
 FILE* writeColorImage(Image img){
     if (img.format == GREYSCALE){
         printf("Wrong write function called, switching over...\n");
-        writeGreyScaleImage(img);
+        return writeGreyScaleImage(img);
     }
     FILE *new_fp;
     new_fp = fopen("new_Bugio8.ppm","w");
