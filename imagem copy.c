@@ -142,7 +142,9 @@ Image toNegative(Image img){
         return new_img;
     }
 }
-Image toBrighter(Image img){
+Image toBrightnessAjust(Image img, int value){
+    value = value > 100 ? 100 : value;
+    value = value < -100 ? -100 : value;
     Image new_img;
     new_img.height = img.height;
     new_img.width = img.width;
@@ -158,12 +160,12 @@ Image toBrighter(Image img){
         {
             for (int j = 0; j < img.width; j++)
             {
-                matriz[i][j].r = img.pixeis[i][j].r + 100 > new_img.max_value ? 
-                                                new_img.max_value:img.pixeis[i][j].r + 20;
-                matriz[i][j].g = img.pixeis[i][j].g + 100 > new_img.max_value ? 
-                                                new_img.max_value:img.pixeis[i][j].g + 20;
-                matriz[i][j].b = img.pixeis[i][j].b + 100 > new_img.max_value ? 
-                                                new_img.max_value:img.pixeis[i][j].b + 20;
+                matriz[i][j].r = img.pixeis[i][j].r + value > new_img.max_value ? 
+                                                new_img.max_value:img.pixeis[i][j].r + value;
+                matriz[i][j].g = img.pixeis[i][j].g + value > new_img.max_value ? 
+                                                new_img.max_value:img.pixeis[i][j].g + value;
+                matriz[i][j].b = img.pixeis[i][j].b + value > new_img.max_value ? 
+                                                new_img.max_value:img.pixeis[i][j].b + value;
             }
         }
         new_img.pixeis = matriz;
@@ -175,8 +177,8 @@ Image toBrighter(Image img){
         {
             for (int j = 0; j < img.width; j++)
             {
-                matriz[i][j].a = img.pixeis[i][j].a + 100 > new_img.max_value ? 
-                                                new_img.max_value:img.pixeis[i][j].a + 20;
+                matriz[i][j].a = img.pixeis[i][j].a + value > new_img.max_value ? 
+                                                new_img.max_value:img.pixeis[i][j].a + value;
             }
         }
         new_img.pixeis = matriz;
@@ -293,7 +295,7 @@ void main(void){
     FILE *fp;
     fp = fopen("Bugio8.ppm","r");
     Image img = readImage(fp);
-    Image new_img = toOlder(img);
+    Image new_img = toBrightnessAjust(img, 100);
     writeImage(new_img);
     
 
