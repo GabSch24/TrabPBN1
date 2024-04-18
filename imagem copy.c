@@ -5,14 +5,20 @@ enum Format{
     RGB,
     GREYSCALE
 };
-
+typedef struct
+{
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+    unsigned char a;
+} Pixel;
 typedef struct
 {
     int height;
     int width;
     int max_value;
     enum Format format; 
-    unsigned char *pixeis;
+    Pixel **pixeis;
 } Image;
 
 FILE* writeColorImage(Image img);
@@ -37,20 +43,33 @@ Image readImage(FILE *fp){
     //printf("%d\n", valor_max);
     img.max_value = valor_max;
     if(img.format == RGB){
-        unsigned char *matriz;
-        matriz = (unsigned char *)malloc((linha * coluna) * sizeof(unsigned char)*3);
-        for (int i = 0; i < (linha*coluna)*3; i += 3)
+        Pixel** matriz;
+        matriz = (Pixel**)malloc(coluna * sizeof(Pixel*));
+        for (int i = 0; i < linha; i++) {
+            matriz[i] = (Pixel*)malloc(linha * sizeof(Pixel));
+        }
+        //Tá alocando pouca memória?
+        for (int i = 0; i < linha; i++)
         {
-            fscanf(fp,"%d %d %d", &matriz[i], &matriz[i+1], &matriz[i+2]);
+            for (int j = 0; j < coluna; j++)
+            {
+                fscanf(fp,"%d %d %d", &matriz[i][j].r, &matriz[i][j].g, &matriz[i][j].b);
+            }
         }
         img.pixeis = matriz;
     }
     else if(img.format == GREYSCALE){
-        unsigned char *matriz;
-        matriz = (unsigned char *)malloc((linha * coluna) * sizeof(unsigned char));
-        for (int i = 0; i < linha*coluna; i++)
+        Pixel** matriz;
+        matriz = (Pixel**)malloc(linha * sizeof(Pixel*));
+        for (int i = 0; i < linha; i++) {
+            matriz[i] = (Pixel*)malloc(coluna * sizeof(Pixel));
+        }
+        for (int i = 0; i < linha; i++)
         {
-            fscanf(fp,"%d", &matriz[i]);
+            for (int j = 0; j < coluna; j++)
+            {
+                fscanf(fp,"%d", &matriz[i][j].a);
+            }
         }
         img.pixeis = matriz;
     }
@@ -70,15 +89,72 @@ Image toGrayScale(Image img){
     new_img.height = img.height;
     new_img.width = img.width;
     new_img.max_value = img.max_value;
-    unsigned char *matriz;
-    matriz = (unsigned char *)malloc((img.height * img.width) * sizeof(unsigned char));
-    for (int i = 0; i < img.height*img.width; i++)
-    {
-        new_img.pixeis[i] = (img.pixeis[3*i] * 0.299 +
-                                     img.pixeis[3*i+1] * 0.587 +
-                                     img.pixeis[3*i+2] * 0.114);
+    Pixel** matriz;
+    matriz = (Pixel**)malloc(img.height * sizeof(Pixel*));
+    for (int i = 0; i < img.height; i++) {
+        matriz[i] = (Pixel*)malloc(img.width * sizeof(Pixel));
     }
-    img.pixeis = matriz;
+    for (int i = 0; i < img.height; i++)
+    {
+        for (int j = 0; j < img.width; j++)
+        {
+            matriz[i][j].a = (img.pixeis[i][j].r * 0.299 +
+                              img.pixeis[i][j].g * 0.587 +
+                              img.pixeis[i][j].b * 0.114);
+        }
+    }
+    new_img.pixeis = matriz;
+    return new_img;
+}
+Image toNegative(Image img){
+    Image new_img;
+    new_img.height = img.height;
+    new_img.width = img.width;
+    new_img.max_value = img.max_value;
+    Pixel **matriz;
+    matriz = (Pixel**)malloc(img.height * sizeof(Pixel*));
+    for (int i = 0; i < img.height; i++) {
+        matriz[i] = (Pixel*)malloc(img.width * sizeof(Pixel));
+    }
+    if (img.format == RGB){
+        new_img.format = RGB;
+        for (int i = 0; i < img.height; i++)
+        {
+            for (int j = 0; j < img.width; j++)
+            {
+                matriz[i][j].r = img.pixeis[i][j].r;
+                matriz[i][j].g = img.pixeis[i][j].g;
+                matriz[i][j].b = img.pixeis[i][j].b;
+            }
+        }
+        new_img.pixeis = matriz;
+        return new_img;
+    }
+}
+Image to90graus(Image img){
+    Image new_img;
+    new_img.height = img.width;
+    new_img.width = img.height;
+    new_img.max_value = img.max_value;
+    Pixel **matriz;
+    matriz = (Pixel**)malloc(img.height * sizeof(Pixel*));
+    for (int i = 0; i < img.height; i++) {
+        matriz[i] = (Pixel*)malloc(img.width * sizeof(Pixel));
+    }
+    if (img.format == RGB){
+        new_img.format = RGB;
+        for (int i = 0; i < new_img.height; i++)
+        {
+            for (int j = 0; j < new_img.width; j++)
+            {
+                matriz[i][j].r = img.pixeis[j][i].r;
+                matriz[i][j].g = img.pixeis[j][i].g;
+                matriz[i][j].b = img.pixeis[j][i].b;
+            }
+        }
+        new_img.pixeis = matriz;
+        return new_img;
+    }
 }
 FILE* writeGreyScaleImage(Image img){
     if (img.format == RGB){
@@ -91,9 +167,11 @@ FILE* writeGreyScaleImage(Image img){
     fprintf(new_fp, "%d %d\n", img.width, img.height);
     fprintf(new_fp, "%d\n", img.max_value);
 
-    for(int i=0; i<img.height * img.width; i++){
-
-        fprintf(new_fp,"%d\n", (int)(img.pixeis[i]));
+    for(int i=0; i<img.height; i++){
+        for (int j = 0; j < img.width; j++)
+        {
+            fprintf(new_fp,"%d\n", img.pixeis[i][j].a);
+        }
     }
     fclose(new_fp);
 
@@ -111,9 +189,14 @@ FILE* writeColorImage(Image img){
     fprintf(new_fp, "%d %d\n", img.width, img.height);
     fprintf(new_fp, "%d\n", img.max_value);
 
-    for(int i=0; i<(img.height * img.width)*3; i++){
-
-        fprintf(new_fp,"%d\n", img.pixeis[i]);
+    for(int i=0; i<img.height; i++){
+        for (int j = 0; j < img.width; j++)
+        {
+            fprintf(new_fp,"%d\n%d\n%d\n", 
+                    img.pixeis[i][j].r, 
+                    img.pixeis[i][j].g, 
+                    img.pixeis[i][j].b);
+        }
     }
     fclose(new_fp);
 
@@ -123,9 +206,10 @@ FILE* writeColorImage(Image img){
 void main(void){
     FILE *fp;
     fp = fopen("Bugio8.ppm","r");
-
     Image img = readImage(fp);
-    writeColorImage(img);
+    Image new_img = to90graus(img);
+
+    writeColorImage(new_img);
     
 
     free(&img.pixeis[0]);
