@@ -1,0 +1,12 @@
+*
+!*.c
+!*.ppm
+!*.py
+!*.txt
+!*.png
+!*.jpg
+!*.csv
+!*.MD
+!*.json
+!.vscode
+!*.gitignore
