@@ -44,11 +44,10 @@ Image readImage(FILE *fp){
     img.max_value = valor_max;
     if(img.format == RGB){
         Pixel** matriz;
-        matriz = (Pixel**)malloc(coluna * sizeof(Pixel*));
+        matriz = (Pixel**)malloc(linha * sizeof(Pixel*));
         for (int i = 0; i < linha; i++) {
-            matriz[i] = (Pixel*)malloc(linha * sizeof(Pixel));
+            matriz[i] = (Pixel*)malloc(coluna * sizeof(Pixel));
         }
-        //Tá alocando pouca memória?
         for (int i = 0; i < linha; i++)
         {
             for (int j = 0; j < coluna; j++)
@@ -137,8 +136,8 @@ Image to90graus(Image img){
     new_img.width = img.height;
     new_img.max_value = img.max_value;
     Pixel **matriz;
-    matriz = (Pixel**)malloc(img.height * sizeof(Pixel*));
-    for (int i = 0; i < img.height; i++) {
+    matriz = (Pixel**)malloc(new_img.height * sizeof(Pixel*));
+    for (int i = 0; i < new_img.height; i++) {
         matriz[i] = (Pixel*)malloc(img.width * sizeof(Pixel));
     }
     if (img.format == RGB){
@@ -214,7 +213,7 @@ void main(void){
 
     free(&img.pixeis[0]);
     
-    
+
     fclose(fp);
 
 }
