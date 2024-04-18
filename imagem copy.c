@@ -121,9 +121,62 @@ Image toNegative(Image img){
         {
             for (int j = 0; j < img.width; j++)
             {
-                matriz[i][j].r = img.pixeis[i][j].r;
-                matriz[i][j].g = img.pixeis[i][j].g;
-                matriz[i][j].b = img.pixeis[i][j].b;
+                matriz[i][j].r = img.max_value - img.pixeis[i][j].r;
+                matriz[i][j].g = img.max_value - img.pixeis[i][j].g;
+                matriz[i][j].b = img.max_value - img.pixeis[i][j].b;
+            }
+        }
+        new_img.pixeis = matriz;
+        return new_img;
+    }
+    else if (img.format == GREYSCALE){
+        new_img.format = GREYSCALE;
+        for (int i = 0; i < img.height; i++)
+        {
+            for (int j = 0; j < img.width; j++)
+            {
+                matriz[i][j].a = img.max_value - img.pixeis[i][j].a;
+            }
+        }
+        new_img.pixeis = matriz;
+        return new_img;
+    }
+}
+Image toBrighter(Image img){
+    Image new_img;
+    new_img.height = img.height;
+    new_img.width = img.width;
+    new_img.max_value = img.max_value;
+    Pixel **matriz;
+    matriz = (Pixel**)malloc(img.height * sizeof(Pixel*));
+    for (int i = 0; i < img.height; i++) {
+        matriz[i] = (Pixel*)malloc(img.width * sizeof(Pixel));
+    }
+    if (img.format == RGB){
+        new_img.format = RGB;
+        for (int i = 0; i < img.height; i++)
+        {
+            for (int j = 0; j < img.width; j++)
+            {
+                matriz[i][j].r = img.pixeis[i][j].r + 100 > new_img.max_value ? 
+                                                new_img.max_value:img.pixeis[i][j].r + 20;
+                matriz[i][j].g = img.pixeis[i][j].g + 100 > new_img.max_value ? 
+                                                new_img.max_value:img.pixeis[i][j].g + 20;
+                matriz[i][j].b = img.pixeis[i][j].b + 100 > new_img.max_value ? 
+                                                new_img.max_value:img.pixeis[i][j].b + 20;
+            }
+        }
+        new_img.pixeis = matriz;
+        return new_img;
+    }
+    else if(img.format == GREYSCALE){
+        new_img.format = GREYSCALE;
+        for (int i = 0; i < img.height; i++)
+        {
+            for (int j = 0; j < img.width; j++)
+            {
+                matriz[i][j].a = img.pixeis[i][j].a + 100 > new_img.max_value ? 
+                                                new_img.max_value:img.pixeis[i][j].a + 20;
             }
         }
         new_img.pixeis = matriz;
@@ -206,8 +259,8 @@ void main(void){
     FILE *fp;
     fp = fopen("Bugio8.ppm","r");
     Image img = readImage(fp);
-    Image new_img = to90graus(img);
-
+    Image new_img = toGrayScale(img);
+    new_img = toBrighter(new_img);
     writeColorImage(new_img);
     
 
