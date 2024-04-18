@@ -208,11 +208,41 @@ Image to90graus(Image img){
         return new_img;
     }
 }
-FILE* writeGreyScaleImage(Image img){
-    if (img.format == RGB){
-        printf("Wrong write function called, switching over...\n");
-        return writeColorImage(img);
+Image toOlder(Image old_img){
+    Image new_img;
+    new_img.height = old_img.height;
+    new_img.width = old_img.width;
+    new_img.max_value = old_img.max_value;
+    Pixel **matriz;
+    matriz = (Pixel**)malloc(old_img.height * sizeof(Pixel*));
+    for (int i = 0; i < old_img.height; i++) {
+        matriz[i] = (Pixel*)malloc(old_img.width * sizeof(Pixel));
     }
+    if (old_img.format == RGB){
+        new_img.format = RGB;
+        for (int i = 0; i < old_img.height; i++)
+        {
+            for (int j = 0; j < old_img.width; j++)
+            {
+                int newR =  0.393 * old_img.pixeis[i][j].r +
+                            0.769 * old_img.pixeis[i][j].g +
+                            0.189 * old_img.pixeis[i][j].b;
+                matriz[i][j].r = newR > 255 ? 255:newR;
+                int newG =  0.349 * old_img.pixeis[i][j].r +
+                            0.686 * old_img.pixeis[i][j].g + 
+                            0.168 * old_img.pixeis[i][j].b;
+                matriz[i][j].g = newG > 255 ? 255:newG;
+                int newB =  0.272 * old_img.pixeis[i][j].r + 
+                            0.534 * old_img.pixeis[i][j].g + 
+                            0.131 * old_img.pixeis[i][j].b;
+                matriz[i][j].b = newB > 255 ? 255:newB;
+            }
+        }
+        new_img.pixeis = matriz;
+        return new_img;
+    }
+}
+FILE* writeGreyScaleImage(Image img){
     FILE *new_fp;
     new_fp = fopen("new_Bugio8.ppm","w");
     fprintf(new_fp, "P2\n");
@@ -231,10 +261,6 @@ FILE* writeGreyScaleImage(Image img){
 
 }
 FILE* writeColorImage(Image img){
-    if (img.format == GREYSCALE){
-        printf("Wrong write function called, switching over...\n");
-        return writeGreyScaleImage(img);
-    }
     FILE *new_fp;
     new_fp = fopen("new_Bugio8.ppm","w");
     fprintf(new_fp, "P3\n");
@@ -255,13 +281,20 @@ FILE* writeColorImage(Image img){
     return new_fp;
 
 }
+FILE* writeImage(Image img){
+    if (img.format == GREYSCALE){
+        return writeGreyScaleImage(img);
+    }
+    if (img.format == RGB){
+        return writeColorImage(img);
+    }
+}
 void main(void){
     FILE *fp;
     fp = fopen("Bugio8.ppm","r");
     Image img = readImage(fp);
-    Image new_img = toGrayScale(img);
-    new_img = toBrighter(new_img);
-    writeColorImage(new_img);
+    Image new_img = toOlder(img);
+    writeImage(new_img);
     
 
     free(&img.pixeis[0]);
