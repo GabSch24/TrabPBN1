@@ -142,9 +142,49 @@ Image toNegative(Image img){
         return new_img;
     }
 }
-Image toBrightnessAjust(Image img, int value){
-    value = value > 100 ? 100 : value;
-    value = value < -100 ? -100 : value;
+
+Image reduceBrightness(Image img, char value){
+    Image new_img;
+    new_img.height = img.height;
+    new_img.width = img.width;
+    new_img.max_value = img.max_value;
+    Pixel **matriz;
+    matriz = (Pixel**)malloc(img.height * sizeof(Pixel*));
+    for (int i = 0; i < img.height; i++) {
+        matriz[i] = (Pixel*)malloc(img.width * sizeof(Pixel));
+    }
+    if (img.format == RGB){
+        new_img.format = RGB;
+        for (int i = 0; i < img.height; i++)
+        {
+            for (int j = 0; j < img.width; j++)
+            {
+                matriz[i][j].r = img.pixeis[i][j].r + value < 0 ? 
+                                                0:img.pixeis[i][j].r + value;
+                matriz[i][j].g = img.pixeis[i][j].g + value < 0 ? 
+                                                0:img.pixeis[i][j].g + value;
+                matriz[i][j].b = img.pixeis[i][j].b + value < 0 ? 
+                                                0:img.pixeis[i][j].b + value;
+            }
+        }
+        new_img.pixeis = matriz;
+        return new_img;
+    }
+    else if(img.format == GREYSCALE){
+        new_img.format = GREYSCALE;
+        for (int i = 0; i < img.height; i++)
+        {
+            for (int j = 0; j < img.width; j++)
+            {
+                matriz[i][j].a = img.pixeis[i][j].a + value < 0? 
+                                                0:img.pixeis[i][j].a + value;
+            }
+        }
+        new_img.pixeis = matriz;
+        return new_img;
+    }
+}
+Image increaseBrightness(Image img, char value){
     Image new_img;
     new_img.height = img.height;
     new_img.width = img.width;
@@ -184,6 +224,10 @@ Image toBrightnessAjust(Image img, int value){
         new_img.pixeis = matriz;
         return new_img;
     }
+}
+Image brightnessAjust(Image img, char value){
+    if (value < 0) return reduceBrightness(img, value);
+    else return increaseBrightness(img, value);
 }
 Image to90graus(Image img){
     Image new_img;
@@ -295,13 +339,12 @@ void main(void){
     FILE *fp;
     fp = fopen("Bugio8.ppm","r");
     Image img = readImage(fp);
-    Image new_img = toBrightnessAjust(img, 100);
+    img = toGrayScale(img);
+    Image new_img = brightnessAjust(img, -100);
     writeImage(new_img);
     
-
     free(&img.pixeis[0]);
     
-
     fclose(fp);
 
 }
