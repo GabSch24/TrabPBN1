@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
+char file_name[25];
 enum Format{
     RGB,
     GREYSCALE
@@ -289,8 +291,10 @@ Image toOlder(Image old_img){
     }
 }
 FILE* writeGreyScaleImage(Image img){
+    char new_file_name[30] = "new_";
+    strcat(new_file_name,file_name);
     FILE *new_fp;
-    new_fp = fopen("new_Bugio8.ppm","w");
+    new_fp = fopen(new_file_name,"w+");
     fprintf(new_fp, "P2\n");
     fprintf(new_fp, "%d %d\n", img.width, img.height);
     fprintf(new_fp, "%d\n", img.max_value);
@@ -307,8 +311,10 @@ FILE* writeGreyScaleImage(Image img){
 
 }
 FILE* writeColorImage(Image img){
+    char new_file_name[30] = "new_";
+    strcat(new_file_name,file_name);
     FILE *new_fp;
-    new_fp = fopen("new_Bugio8.ppm","w");
+    new_fp = fopen(new_file_name,"w+");
     fprintf(new_fp, "P3\n");
     fprintf(new_fp, "%d %d\n", img.width, img.height);
     fprintf(new_fp, "%d\n", img.max_value);
@@ -336,15 +342,59 @@ FILE* writeImage(Image img){
     }
 }
 void main(void){
+    
+    unsigned char image_modification_choice;
+    printf("Digite o nome do arquivo: ");
+    scanf("%s",file_name);
+    printf("Digite:\n0 - Gerar imagem em tons de cinza\n1 - Imagem em tons de cinza - gerar imagem negativa\n2 - Imagem tons de cinza - aumentar o brilho\n");
+    printf("3 - Imagem tons de cinza - diminuir o brilho\n4 - Rotacionar imagem colorida -90 graus\n5 - Imagem colorida - envelhecimento da imagem");
+    printf("Escolha: ");
     FILE *fp;
-    fp = fopen("Bugio8.ppm","r");
+    fp = fopen(file_name,"r");
     Image img = readImage(fp);
-    img = toGrayScale(img);
-    Image new_img = brightnessAjust(img, -100);
-    writeImage(new_img);
-    
+    //printf("%s",file_name);
+    while(1) {
+        scanf("%d",&image_modification_choice);
+        if(image_modification_choice < 6) {
+            break;
+        }
+    }
+    if(image_modification_choice == 0) {
+        Image gray_img = toGrayScale(img);
+        writeGreyScaleImage(gray_img);
+        free(&gray_img.pixeis[0]);
+    }
+    else if(image_modification_choice == 1) {
+        Image gray_img = toGrayScale(img);
+        Image negative_img = toNegative(gray_img);
+        writeGreyScaleImage(negative_img);
+        free(&gray_img.pixeis[0]);
+        free(&negative_img.pixeis[0]);
+    }
+    else if(image_modification_choice == 2) {
+        Image gray_img = toGrayScale(img);
+        Image increase_img_brightness = brightnessAjust(gray_img,100);
+        writeGreyScaleImage(increase_img_brightness);
+        free(&gray_img.pixeis[0]);
+        free(&increase_img_brightness.pixeis[0]);
+    }
+    else if(image_modification_choice == 3) {
+        Image gray_img = toGrayScale(img);
+        Image decrease_img_brightness = brightnessAjust(gray_img,-100);
+        writeGreyScaleImage(decrease_img_brightness);
+        free(&gray_img.pixeis[0]);
+        free(&decrease_img_brightness.pixeis[0]);
+    }
+    else if(image_modification_choice == 4) {
+        Image rotate_img = to90graus(img);
+        writeColorImage(rotate_img);
+        free(&rotate_img.pixeis[0]);
+    }
+    else {
+        Image age_img = toOlder(img);
+        writeColorImage(age_img);
+        free(&age_img.pixeis[0]);
+    }
     free(&img.pixeis[0]);
-    
     fclose(fp);
-
 }
