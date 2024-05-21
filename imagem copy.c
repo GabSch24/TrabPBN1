@@ -347,7 +347,7 @@ void main(void){
     printf("Digite o nome do arquivo: ");
     scanf("%s",file_name);
     printf("Digite:\n0 - Gerar imagem em tons de cinza\n1 - Imagem em tons de cinza - gerar imagem negativa\n2 - Imagem tons de cinza - aumentar o brilho\n");
-    printf("3 - Imagem tons de cinza - diminuir o brilho\n4 - Rotacionar imagem colorida -90 graus\n5 - Imagem colorida - envelhecimento da imagem\n");
+    printf("3 - Imagem tons de cinza - diminuir o brilho\n4 - Rotacionar imagem -90 graus\n5 - Imagem colorida - envelhecimento da imagem\n");
     printf("Escolha: ");
     FILE *fp;
     fp = fopen(file_name,"r");
@@ -408,7 +408,7 @@ else if(image_modification_choice == 3) {
     }
     else if(image_modification_choice == 4) {
         Image rotate_img = to90graus(img);
-        writeColorImage(rotate_img);
+        writeImage(rotate_img);
         for(int i = 0; i < rotate_img.height; i++) {
             free(rotate_img.pixeis[i]);
         }
