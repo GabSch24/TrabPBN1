@@ -347,7 +347,7 @@ void main(void){
     printf("Digite o nome do arquivo: ");
     scanf("%s",file_name);
     printf("Digite:\n0 - Gerar imagem em tons de cinza\n1 - Imagem em tons de cinza - gerar imagem negativa\n2 - Imagem tons de cinza - aumentar o brilho\n");
-    printf("3 - Imagem tons de cinza - diminuir o brilho\n4 - Rotacionar imagem colorida -90 graus\n5 - Imagem colorida - envelhecimento da imagem");
+    printf("3 - Imagem tons de cinza - diminuir o brilho\n4 - Rotacionar imagem colorida -90 graus\n5 - Imagem colorida - envelhecimento da imagem\n");
     printf("Escolha: ");
     FILE *fp;
     fp = fopen(file_name,"r");
@@ -362,39 +362,69 @@ void main(void){
     if(image_modification_choice == 0) {
         Image gray_img = toGrayScale(img);
         writeGreyScaleImage(gray_img);
-        free(&gray_img.pixeis[0]);
+        for(int i = 0; i < gray_img.height; i++) {
+            free(gray_img.pixeis[i]);
+        }
+        free(gray_img.pixeis);
     }
     else if(image_modification_choice == 1) {
         Image gray_img = toGrayScale(img);
         Image negative_img = toNegative(gray_img);
         writeGreyScaleImage(negative_img);
-        free(&gray_img.pixeis[0]);
-        free(&negative_img.pixeis[0]);
+        for(int i = 0; i < gray_img.height; i++) {
+            free(gray_img.pixeis[i]);
+        }
+        free(gray_img.pixeis);
+        for(int i = 0; i < negative_img.height; i++) {
+            free(negative_img.pixeis[i]);
+        }
+        free(negative_img.pixeis);
     }
     else if(image_modification_choice == 2) {
         Image gray_img = toGrayScale(img);
         Image increase_img_brightness = brightnessAjust(gray_img,100);
         writeGreyScaleImage(increase_img_brightness);
-        free(&gray_img.pixeis[0]);
-        free(&increase_img_brightness.pixeis[0]);
+        for(int i = 0; i < gray_img.height; i++) {
+            free(gray_img.pixeis[i]);
+        }
+        free(gray_img.pixeis);
+        for(int i = 0; i < increase_img_brightness.height; i++) {
+            free(increase_img_brightness.pixeis[i]);
+        }
+        free(increase_img_brightness.pixeis);
     }
-    else if(image_modification_choice == 3) {
+else if(image_modification_choice == 3) {
         Image gray_img = toGrayScale(img);
         Image decrease_img_brightness = brightnessAjust(gray_img,-100);
         writeGreyScaleImage(decrease_img_brightness);
-        free(&gray_img.pixeis[0]);
-        free(&decrease_img_brightness.pixeis[0]);
+        for(int i = 0; i < gray_img.height; i++) {
+            free(gray_img.pixeis[i]);
+        }
+        free(gray_img.pixeis);
+        for(int i = 0; i < decrease_img_brightness.height; i++) {
+            free(decrease_img_brightness.pixeis[i]);
+        }
+        free(decrease_img_brightness.pixeis);
     }
     else if(image_modification_choice == 4) {
         Image rotate_img = to90graus(img);
         writeColorImage(rotate_img);
-        free(&rotate_img.pixeis[0]);
+        for(int i = 0; i < rotate_img.height; i++) {
+            free(rotate_img.pixeis[i]);
+        }
+        free(rotate_img.pixeis);
     }
     else {
         Image age_img = toOlder(img);
         writeColorImage(age_img);
-        free(&age_img.pixeis[0]);
+        for(int i = 0; i < age_img.height; i++) {
+            free(age_img.pixeis[i]);
+        }
+        free(age_img.pixeis);
     }
-    free(&img.pixeis[0]);
+    for(int i = 0; i < img.height; i++) {
+        free(img.pixeis[i]);
+    }
+    free(img.pixeis);
     fclose(fp);
 }
