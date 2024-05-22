@@ -228,7 +228,7 @@ Image increaseBrightness(Image img, char value){
     }
 }
 Image brightnessAjust(Image img, char value){
-    if (value < 0) return reduceBrightness(img, value);
+    if (value < 0) return reduceBrightness(img, 0-value);
     else return increaseBrightness(img, value);
 }
 Image to90graus(Image img){
