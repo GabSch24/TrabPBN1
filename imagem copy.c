@@ -83,7 +83,7 @@ Image readImage(FILE *fp){
 }
 Image toGrayScale(Image img){
     if (img.format == GREYSCALE){
-        printf("Invalid image format to convert, expect errors\n");
+        printf("Formato inválido de imagem para converter, espere erros\n");
     }
     Image new_img;
     new_img.format = GREYSCALE;
